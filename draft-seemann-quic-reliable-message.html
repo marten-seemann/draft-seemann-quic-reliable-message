@@ -1176,10 +1176,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
       </h2>
 <p id="section-1-1">Applications running on top of QUIC (<span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) have two options to transmit
 data. First, they can send data on top of (unidirectional or bidirectional) QUIC
-streams. Second, with <span>[<a href="#RFC9221" class="cite xref">RFC9221</a>]</span> defines an unreliable datagram extension to
-QUIC. In the case of packet loss, data sent on QUIC streams is automatically
-retransmitted, unless the stream was reset. DATAGRAM frames are not
-retransmitted.<a href="#section-1-1" class="pilcrow">¶</a></p>
+streams. Second, <span>[<a href="#RFC9221" class="cite xref">RFC9221</a>]</span> defines an unreliable datagram extension to QUIC.
+In the case of packet loss, data sent on QUIC streams is retransmitted, unless
+the stream was reset. DATAGRAM frames are not retransmitted.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">This document defines an extension to QUIC that introduces a new frame, the
 MESSAGE frame. This frame is intended for short (sub-MTU) messages that need to
 be delivered reliably. However, implementations may allow the application to
@@ -1193,13 +1192,13 @@ update the message before sending a retransmission.<a href="#section-1-2" class=
       </h2>
 <p id="section-2-1">If the extension is negotiated, an endpoint is allowed to send MESSAGE frames up
 to the maximum sequence number the peer advertised in the max_message_id
-transport paramter. Endpoints <span class="bcp14">SHOULD</span> regularly increase the maximum sequence
+transport parameter. Endpoints <span class="bcp14">SHOULD</span> regularly increase the maximum sequence
 number by sending MAX_MESSAGE frames as MESSAGE frames are consumed.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">When a MESSAGE frame is declared lost, implemenations <span class="bcp14">MUST</span> do one of two things:
+<p id="section-2-2">When a MESSAGE frame is declared lost, implementations <span class="bcp14">MUST</span> do one of two things:
 They either <span class="bcp14">MUST</span> retransmit the frame, or they <span class="bcp14">MUST</span> inform the application. The
 application <span class="bcp14">MAY</span> decide that the frame does not need to be retransmitted, or it
 <span class="bcp14">MAY</span> update the contents of the message. If the contents of the message are
-updated, it <span class="bcp14">MUST</span> be transmitted using a new sequence nubmer.<a href="#section-2-2" class="pilcrow">¶</a></p>
+updated, it <span class="bcp14">MUST</span> be transmitted using a new sequence number.<a href="#section-2-2" class="pilcrow">¶</a></p>
 <p id="section-2-3">The receiver of a MESSAGE frame <span class="bcp14">MUST</span> deliver the frame to the application. It
 <span class="bcp14">MUST NOT</span> drop the frame, unless the connection is closed.<a href="#section-2-3" class="pilcrow">¶</a></p>
 </section>
@@ -1277,7 +1276,7 @@ ignore MAX_MESSAGE frames that do not increase the Maximum Sequence Number.<a hr
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-negotiating-extension-use" class="section-name selfRef">Negotiating Extension Use</a>
       </h2>
 <p id="section-4-1">Endpoints advertise their support of the extension described in this document by
-sending the max_message_id (TBD) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) with variable-length integer value specifiying the maximum sequence
+sending the max_message_id (TBD) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) with variable-length integer value specifying the maximum sequence
 number of MESSAGE frames it is willing to receive. An implementation that
 understands this transport parameter <span class="bcp14">MUST</span> treat the receipt of an invalid value
 as a connection error of type TRANSPORT_PARAMETER_ERROR.<a href="#section-4-1" class="pilcrow">¶</a></p>
