@@ -42,10 +42,9 @@ This document introduces a new way to transmit reliable messages on top of QUIC.
 
 Applications running on top of QUIC ({{!RFC9000}}) have two options to transmit
 data. First, they can send data on top of (unidirectional or bidirectional) QUIC
-streams. Second, with {{!RFC9221}} defines an unreliable datagram extension to
-QUIC. In the case of packet loss, data sent on QUIC streams is automatically
-retransmitted, unless the stream was reset. DATAGRAM frames are not
-retransmitted.
+streams. Second, {{!RFC9221}} defines an unreliable datagram extension to QUIC.
+In the case of packet loss, data sent on QUIC streams is retransmitted, unless
+the stream was reset. DATAGRAM frames are not retransmitted.
 
 This document defines an extension to QUIC that introduces a new frame, the
 MESSAGE frame. This frame is intended for short (sub-MTU) messages that need to
@@ -56,14 +55,14 @@ update the message before sending a retransmission.
 
 If the extension is negotiated, an endpoint is allowed to send MESSAGE frames up
 to the maximum sequence number the peer advertised in the max_message_id
-transport paramter. Endpoints SHOULD regularly increase the maximum sequence
+transport parameter. Endpoints SHOULD regularly increase the maximum sequence
 number by sending MAX_MESSAGE frames as MESSAGE frames are consumed.
 
-When a MESSAGE frame is declared lost, implemenations MUST do one of two things:
+When a MESSAGE frame is declared lost, implementations MUST do one of two things:
 They either MUST retransmit the frame, or they MUST inform the application. The
 application MAY decide that the frame does not need to be retransmitted, or it
 MAY update the contents of the message. If the contents of the message are
-updated, it MUST be transmitted using a new sequence nubmer.
+updated, it MUST be transmitted using a new sequence number.
 
 The receiver of a MESSAGE frame MUST deliver the frame to the application. It
 MUST NOT drop the frame, unless the connection is closed.
@@ -121,7 +120,7 @@ ignore MAX_MESSAGE frames that do not increase the Maximum Sequence Number.
 
 Endpoints advertise their support of the extension described in this document by
 sending the max_message_id (TBD) transport parameter ({{Section 7.4 of
-RFC9000}}) with variable-length integer value specifiying the maximum sequence
+RFC9000}}) with variable-length integer value specifying the maximum sequence
 number of MESSAGE frames it is willing to receive. An implementation that
 understands this transport parameter MUST treat the receipt of an invalid value
 as a connection error of type TRANSPORT_PARAMETER_ERROR.
