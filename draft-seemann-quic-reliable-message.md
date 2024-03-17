@@ -60,7 +60,7 @@ transport paramter. Endpoints SHOULD regularly increase the maximum sequence
 number by sending MAX_MESSAGE frames as MESSAGE frames are consumed.
 
 When a MESSAGE frame is declared lost, implemenations MUST do one of two things:
-They either MUST retransmit the frame, or they MUST inform the application. THe
+They either MUST retransmit the frame, or they MUST inform the application. The
 application MAY decide that the frame does not need to be retransmitted, or it
 MAY update the contents of the message. If the contents of the message are
 updated, it MUST be transmitted using a new sequence nubmer.
@@ -92,6 +92,10 @@ Sequence numbers start at 0 and SHOULD be used sequentially.
 Message Data:
 
 : The message data to be delivered.
+
+An endpoint that receives a MESSAGE frame with a Sequence Number larger than the
+maximum sequence number it has previously advertised to the peer MUST close the
+connection with a connection error of type PROTOCOL_VIOLATION.
 
 
 ## MAX_MESSAGE Frame
