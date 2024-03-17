@@ -8,8 +8,8 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: "Web and Internet Transport"
+workgroup: "QUIC"
 keyword:
  - quic
  - message
