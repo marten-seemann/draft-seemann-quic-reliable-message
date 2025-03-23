@@ -1,0 +1,222 @@
+
+
+
+
+QUIC                                                          M. Seemann
+Internet-Draft                                             23 March 2025
+Intended status: Standards Track                                        
+Expires: 24 September 2025
+
+
+                         QUIC Reliable Messages
+               draft-seemann-quic-reliable-message-latest
+
+Abstract
+
+   This document introduces a new way to transmit reliable messages on
+   top of QUIC.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at https://marten-
+   seemann.github.io/draft-seemann-quic-reliable-message/draft-seemann-
+   quic-reliable-message.html.  Status information for this document may
+   be found at https://datatracker.ietf.org/doc/draft-seemann-quic-
+   reliable-message/.
+
+   Discussion of this document takes place on the QUIC Working Group
+   mailing list (mailto:quic@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/quic/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/quic/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/marten-seemann/draft-seemann-quic-reliable-
+   message.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 24 September 2025.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Using MESSAGE frames
+   3.  Frames
+     3.1.  MESSAGE Frame
+     3.2.  MAX_MESSAGE Frame
+   4.  Negotiating Extension Use
+   5.  Conventions and Definitions
+   6.  Security Considerations
+   7.  IANA Considerations
+   8.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   Applications running on top of QUIC ([RFC9000]) have two options to
+   transmit data.  First, they can send data on top of (unidirectional
+   or bidirectional) QUIC streams.  Second, [RFC9221] defines an
+   unreliable datagram extension to QUIC.  In the case of packet loss,
+   data sent on QUIC streams is retransmitted, unless the stream was
+   reset.  DATAGRAM frames are not retransmitted.
+
+   This document defines an extension to QUIC that introduces a new
+   frame, the MESSAGE frame.  This frame is intended for short (sub-MTU)
+   messages that need to be delivered reliably.  However,
+   implementations may allow the application to update the message
+   before sending a retransmission.
+
+2.  Using MESSAGE frames
+
+   If the extension is negotiated, an endpoint is allowed to send
+   MESSAGE frames up to the maximum sequence number the peer advertised
+   in the max_message_id transport parameter.  Endpoints SHOULD
+   regularly increase the maximum sequence number by sending MAX_MESSAGE
+   frames as MESSAGE frames are consumed.
+
+   When a MESSAGE frame is declared lost, implementations MUST do one of
+   two things: They either MUST retransmit the frame, or they MUST
+   inform the application.  The application MAY decide that the frame
+   does not need to be retransmitted, or it MAY update the contents of
+   the message.  If the contents of the message are updated, it MUST be
+   transmitted using a new sequence number.
+
+   The receiver of a MESSAGE frame MUST deliver the frame to the
+   application.  It MUST NOT drop the frame, unless the connection is
+   closed.
+
+3.  Frames
+
+   There are two frames, the MESSAGE frame, and the MAX_MESSAGE frame.
+
+3.1.  MESSAGE Frame
+
+   MESSAGE Frame {
+     Type (i) = TBD,
+     Sequence Number (i),
+     Message Data (...),
+   }
+
+   The MESSAGE frame contains the following fields:
+
+   Sequence Number:  A variable-length integer encoding of the sequence
+      number of the message.  Sequence numbers start at 0 and SHOULD be
+      used sequentially.
+
+   Message Data:  The message data to be delivered.
+
+   An endpoint that receives a MESSAGE frame with a Sequence Number
+   larger than the maximum sequence number it has previously advertised
+   to the peer MUST close the connection with a connection error of type
+   PROTOCOL_VIOLATION.
+
+3.2.  MAX_MESSAGE Frame
+
+   MAX_MESSAGE Frame {
+     Type (i) = TBD+1,
+     Maximum Sequence Number (i),
+   }
+
+   The MAX_MESSAGE frame contains the following fields:
+
+   Maximum Sequence Number:  The maximum sequence number that the peer
+      is willing to receive.
+
+   The Maximum Sequence Number MUST NOT be decreased.  However, due to
+   reordering on the wire, MAX_MESSAGE frames might be received out of
+   order.  The receiver MUST ignore MAX_MESSAGE frames that do not
+   increase the Maximum Sequence Number.
+
+4.  Negotiating Extension Use
+
+   Endpoints advertise their support of the extension described in this
+   document by sending the max_message_id (TBD) transport parameter
+   (Section 7.4 of [RFC9000]) with variable-length integer value
+   specifying the maximum sequence number of MESSAGE frames it is
+   willing to receive.  An implementation that understands this
+   transport parameter MUST treat the receipt of an invalid value as a
+   connection error of type TRANSPORT_PARAMETER_ERROR.
+
+   When using 0-RTT, both endpoints MUST remember the value of this
+   transport parameter.  This allows use of this extension in 0-RTT
+   packets.  When the server accepts 0-RTT data, the server MUST NOT
+   disable this extension or reduce the value on the resumed connection.
+
+5.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+6.  Security Considerations
+
+   A malicious node could attempt to overwhelm an endpoint by sending a
+   large number of MESSAGE frames.  Endpoints SHOULD make sure to define
+   reasonable limits using the transport parameter and the MAX_MESSAGE
+   frame.
+
+7.  IANA Considerations
+
+   TODO: consider transport parameter and frame types
+
+8.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [RFC9221]  Pauly, T., Kinnear, E., and D. Schinazi, "An Unreliable
+              Datagram Extension to QUIC", RFC 9221,
+              DOI 10.17487/RFC9221, March 2022,
+              <https://www.rfc-editor.org/rfc/rfc9221>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Author's Address
+
+   Marten Seemann
+   Email: martenseemann@gmail.com
