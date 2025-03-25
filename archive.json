@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-30T00:25:19.849644+00:00",
+  "timestamp": "2025-03-25T00:28:27.774081+00:00",
   "repo": "marten-seemann/draft-seemann-quic-reliable-message",
   "labels": [
     {
@@ -50,5 +50,34 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOLhWNiM6PwD8N",
+      "title": "run make update-ci",
+      "url": "https://github.com/marten-seemann/draft-seemann-quic-reliable-message/pull/1",
+      "state": "MERGED",
+      "author": "marten-seemann",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-23T05:50:56Z",
+      "updatedAt": "2025-03-23T05:51:57Z",
+      "baseRepository": "marten-seemann/draft-seemann-quic-reliable-message",
+      "baseRefName": "main",
+      "baseRefOid": "26dc0cb81d43f7206d61af6d657b95c9d37cca9b",
+      "headRepository": "marten-seemann/draft-seemann-quic-reliable-message",
+      "headRefName": "update-ci",
+      "headRefOid": "d18f6bc1ab3b8e4331795a5f997fcf1d7bb92b6b",
+      "closedAt": "2025-03-23T05:51:57Z",
+      "mergedAt": "2025-03-23T05:51:57Z",
+      "mergedBy": "marten-seemann",
+      "mergeCommit": {
+        "oid": "f7ecbcb339a3b3d29193e0b584c38f833c4f9b19"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
